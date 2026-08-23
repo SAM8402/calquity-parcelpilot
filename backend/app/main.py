@@ -43,6 +43,17 @@ async def lifespan(app: FastAPI):
         "ready" if redis_ok else "unavailable",
         cache_service.backend,
     )
+    try:
+        from app.data.embeddings import get_embeddings, read_active_backend
+
+        _, emb_backend = get_embeddings()
+        logger.info(
+            "Embeddings: active=%s stored=%s",
+            emb_backend,
+            read_active_backend() or "none",
+        )
+    except Exception as e:
+        logger.warning("Embeddings not ready yet: %s", e)
     yield
     cache_service.disconnect()
     logger.info("ParcelPilot AI Support Agent - Shutting down")
@@ -77,10 +88,24 @@ async def log_request_timing(request: Request, call_next):
 
 # In-memory chat histories per user+session (prevents cross-user bleed)
 chat_histories: dict[str, list] = {}
+# Reuse agents per user (LLM bind_tools is expensive); always refresh ACL context
+_agent_cache: dict[str, object] = {}
 
 
 def _history_key(user_id: str, session_id: str) -> str:
     return f"{user_id}::{session_id}"
+
+
+def _get_agent(user: User):
+    from app.auth.context import set_current_user
+
+    agent = _agent_cache.get(user.user_id)
+    if agent is None:
+        agent = build_agent(user)
+        _agent_cache[user.user_id] = agent
+    else:
+        set_current_user(user)
+    return agent
 
 
 def get_user(user_id: str) -> User:
@@ -144,7 +169,7 @@ async def chat(request: ChatRequest):
                 from_cache=True,
             )
 
-    agent = build_agent(user)
+    agent = _get_agent(user)
 
     try:
         result = _invoke_agent(agent, request.message, history)
@@ -263,6 +288,8 @@ async def list_users():
 
 @app.get("/api/health")
 async def health():
+    from app.data.embeddings import read_active_backend
+
     return {
         "status": "healthy",
         "version": "1.0.0",
@@ -271,6 +298,7 @@ async def health():
         "vectorstore_available": CHROMA_DIR.exists(),
         "redis_available": cache_service.available,
         "cache_backend": cache_service.backend,
+        "embedding_backend": read_active_backend() or "unknown",
     }
 
 

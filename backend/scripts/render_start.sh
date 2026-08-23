@@ -4,11 +4,23 @@ set -e
 
 cd /app
 
-if [ ! -f /app/parcelpilot.duckdb ] || [ ! -d /app/chroma_db ] || [ -z "$(ls -A /app/chroma_db 2>/dev/null)" ]; then
-  echo "[render_start] DuckDB/Chroma missing — running setup_db.py (needs GOOGLE_API_KEY)..."
+NEED_SETUP=0
+if [ ! -f /app/parcelpilot.duckdb ]; then
+  NEED_SETUP=1
+fi
+if [ ! -d /app/chroma_db ] || [ -z "$(ls -A /app/chroma_db 2>/dev/null)" ]; then
+  NEED_SETUP=1
+fi
+# New embedding backend marker (google/local collections) — re-ingest if missing
+if [ ! -f /app/chroma_db/.embedding_backend ]; then
+  NEED_SETUP=1
+fi
+
+if [ "$NEED_SETUP" = "1" ]; then
+  echo "[render_start] Data/index missing — running setup_db.py (Google embed → local fallback)..."
   python -m app.setup_db
 else
-  echo "[render_start] DuckDB + Chroma present — skipping setup."
+  echo "[render_start] DuckDB + Chroma present (backend=$(cat /app/chroma_db/.embedding_backend)) — skipping setup."
 fi
 
 PORT="${PORT:-10000}"

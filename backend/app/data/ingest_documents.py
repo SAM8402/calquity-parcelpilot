@@ -1,13 +1,22 @@
 import sys
+import logging
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent))
 
 from langchain_community.document_loaders import PyPDFLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
-from langchain_google_genai import GoogleGenerativeAIEmbeddings
 from langchain_community.vectorstores import Chroma
-from app.config import PDF_DIR, CHROMA_DIR, EMBEDDING_MODEL, GOOGLE_API_KEY
+from app.config import PDF_DIR, CHROMA_DIR
+from app.data.embeddings import (
+    collection_name_for,
+    get_embeddings,
+    reset_embeddings_cache,
+    write_active_backend,
+)
+from app.data.vector_store import reset_vectorstore_cache
+
+logger = logging.getLogger(__name__)
 
 
 DOCUMENT_METADATA = {
@@ -64,10 +73,11 @@ def ingest_all_documents(pdf_dir: str = None, persist_dir: str = None):
         chunk_overlap=200,
         separators=["\n\n", "\n", ". ", " "],
     )
-    embeddings = GoogleGenerativeAIEmbeddings(
-        model=EMBEDDING_MODEL,
-        google_api_key=GOOGLE_API_KEY,
-    )
+
+    reset_embeddings_cache()
+    embeddings, backend = get_embeddings(force_rebuild=True)
+    collection = collection_name_for(backend)
+    print(f"Embedding backend for ingest: {backend} → {collection}")
 
     all_docs = []
     for filename, meta in DOCUMENT_METADATA.items():
@@ -93,11 +103,14 @@ def ingest_all_documents(pdf_dir: str = None, persist_dir: str = None):
         documents=all_docs,
         embedding=embeddings,
         persist_directory=str(persist_path),
-        collection_name="parcelpilot_docs",
+        collection_name=collection,
     )
-    print(f"Total chunks ingested: {len(all_docs)}")
+    write_active_backend(backend)
+    reset_vectorstore_cache()
+    print(f"Total chunks ingested: {len(all_docs)} (backend={backend})")
     return vectorstore
 
 
 if __name__ == "__main__":
+    logging.basicConfig(level=logging.INFO)
     ingest_all_documents()

@@ -19,9 +19,10 @@ build/
 *.duckdb.wal
 *.duckdb.tmp
 
-# ChromaDB / vector store
-chroma_db/
-backend/chroma_db/
+# ChromaDB — tracked so Render/deploys ship a prebuilt index
+# (re-ingest still possible via python -m app.setup_db)
+# chroma_db/
+# backend/chroma_db/
 
 # Node
 node_modules/

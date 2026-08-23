@@ -30,6 +30,21 @@ def test_fakeredis_cache_roundtrip(monkeypatch):
     cache.disconnect()
 
 
-def test_cors_origins_loaded():
-    assert isinstance(CORS_ORIGINS, list)
-    assert len(CORS_ORIGINS) >= 1
+def test_hash_embeddings_deterministic():
+    from app.data.embeddings import HashEmbeddings
+
+    emb = HashEmbeddings(dim=64)
+    a = emb.embed_query("cancellation fee ORD-1001")
+    b = emb.embed_query("cancellation fee ORD-1001")
+    c = emb.embed_documents(["a", "b"])
+    assert a == b
+    assert len(a) == 64
+    assert len(c) == 2
+    assert abs(sum(x * x for x in a) - 1.0) < 1e-5
+
+
+def test_collection_name_for_backend():
+    from app.data.embeddings import collection_name_for
+
+    assert collection_name_for("google") == "parcelpilot_docs_google"
+    assert collection_name_for("local") == "parcelpilot_docs_local"

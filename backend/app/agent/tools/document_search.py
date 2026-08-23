@@ -44,7 +44,7 @@ def search_documents(query: str, user_account_id: Optional[str] = None) -> str:
         }
 
     try:
-        results = search_with_metadata(query, k=5, filter_dict=filter_dict)
+        results = search_with_metadata(query, k=4, filter_dict=filter_dict)
     except Exception as e:
         # Never fall back to unfiltered retrieval for customers
         user = get_current_user()
@@ -54,7 +54,7 @@ def search_documents(query: str, user_account_id: Optional[str] = None) -> str:
                 f"Please retry. ({type(e).__name__})"
             )
         try:
-            results = search_with_metadata(query, k=5)
+            results = search_with_metadata(query, k=4)
         except Exception as e2:
             return f"Document search error: {e2}"
 

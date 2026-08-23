@@ -44,7 +44,7 @@ def _clean_content(content) -> str:
 class ToolCallingAgent:
     """Minimal tool-calling agent with an AgentExecutor-compatible invoke()."""
 
-    def __init__(self, llm, tools, system_prompt: str, max_iterations: int = 10):
+    def __init__(self, llm, tools, system_prompt: str, max_iterations: int = 6):
         self.llm = llm.bind_tools(tools)
         self.tools = {t.name: t for t in tools}
         self.system_prompt = system_prompt
@@ -169,5 +169,5 @@ def build_agent(user: User) -> ToolCallingAgent:
         llm=llm,
         tools=tools,
         system_prompt=build_system_prompt(user),
-        max_iterations=10,
+        max_iterations=6,
     )

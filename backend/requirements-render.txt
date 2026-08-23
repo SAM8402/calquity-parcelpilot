@@ -1,7 +1,6 @@
 # Slim requirements for Render free-tier (single Docker web service).
-# Same stack as requirements.txt — ParcelPilot already uses Gemini embeddings
-# (no torch / sentence-transformers). Kept as a separate file so deploy docs
-# match the Gyansetu Render pattern.
+# Google Gemini for LLM + optional embeddings; FastEmbed (ONNX) for local
+# embedding fallback / faster RAG — no torch.
 
 fastapi==0.115.0
 uvicorn[standard]==0.30.0
@@ -17,3 +16,7 @@ pypdf==4.3.1
 duckdb==1.1.0
 redis==5.0.8
 fakeredis==2.26.2
+# Local embedding fallback (ONNX — no torch). Used when Google embeddings fail
+# or EMBEDDING_PREFER_LOCAL=true for faster doc search.
+fastembed==0.4.2
+onnxruntime==1.19.2

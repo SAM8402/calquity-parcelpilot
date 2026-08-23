@@ -46,7 +46,22 @@ if API_KEYS:
 
 GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-2.5-flash")
 LLM_FALLBACK_CHAIN = os.getenv("LLM_FALLBACK_CHAIN", "")
+# Google embeddings (API) — tried first unless EMBEDDING_PREFER_LOCAL=true
 EMBEDDING_MODEL = os.getenv("EMBEDDING_MODEL", "models/gemini-embedding-001")
+# Local ONNX FastEmbed model (no torch). Used when Google fails / prefer local.
+# FastEmbed ids: BAAI/bge-small-en-v1.5, sentence-transformers/all-MiniLM-L6-v2
+LOCAL_EMBEDDING_MODEL = os.getenv(
+    "LOCAL_EMBEDDING_MODEL", "BAAI/bge-small-en-v1.5"
+)
+# auto | google | local | hash
+EMBEDDING_BACKEND = os.getenv("EMBEDDING_BACKEND", "auto")
+# Prefer local for faster doc search (skips Google embed API round-trip)
+EMBEDDING_PREFER_LOCAL = os.getenv("EMBEDDING_PREFER_LOCAL", "false").lower() in {
+    "1",
+    "true",
+    "yes",
+    "on",
+}
 
 CORS_ORIGINS = _parse_cors(
     os.getenv("CORS_ORIGINS", '["http://localhost:3000","http://localhost:8080","*"]')

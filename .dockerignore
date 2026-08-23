@@ -12,10 +12,11 @@
 **/.next
 frontend/out
 
-# Local runtime artifacts (rebuilt on first boot if missing)
-backend/chroma_db
+# Local DuckDB (Excel ingest is fast; rebuild on boot if missing)
 backend/parcelpilot.duckdb
 backend/**/*.duckdb
+
+# Do NOT ignore backend/chroma_db — prebuilt vectors are committed for fast Render boots
 
 # Docs / IDE noise
 *.md
