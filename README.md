@@ -4,6 +4,7 @@ An AI-powered customer support system for **ParcelPilot**, a B2B logistics platf
 
 ## Live Prototype and Deployment
 
+- **CI:** GitHub Actions workflow (Gyansetu-style) — backend flake8 + pytest, frontend lint + Next export build, Docker/compose verification. See [`.github/workflows/ci.yml`](./.github/workflows/ci.yml).
 - **Deploy guide (Render):** see [`DEPLOY_RENDER.md`](./DEPLOY_RENDER.md) — same single-container pattern as [Gyansetu](https://github.com/SAM8402/Gyansetu) (`Dockerfile` + `render.yaml` + `$PORT`).
 - After you deploy, put your URL here: `https://<your-service>.onrender.com`
 

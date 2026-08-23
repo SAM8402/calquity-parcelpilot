@@ -1,0 +1,110 @@
+name: Continuous Integration
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+
+# Cancel outdated workflow runs for the same branch automatically
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  backend:
+    name: Backend Lint & Pytest Suite
+    runs-on: ubuntu-latest
+
+    # No external Redis — cache uses fakeredis when REDIS_URL is empty
+    # (same free-deploy pattern as Gyansetu).
+    env:
+      GOOGLE_API_KEY: ci-mock-key-1,ci-mock-key-2
+      GEMINI_MODEL: gemini-2.5-flash
+      LLM_FALLBACK_CHAIN: gemini-2.5-flash,gemini-2.5-flash-lite,gemini-2.0-flash
+      EMBEDDING_MODEL: models/gemini-embedding-001
+      CORS_ORIGINS: '["http://localhost:3000"]'
+      REDIS_URL: ""
+      CACHE_TTL_CHAT: "600"
+      CACHE_TTL_DOCS: "3600"
+      CACHE_TTL_DATA: "300"
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+          cache-dependency-path: |
+            backend/requirements.txt
+            backend/requirements-render.txt
+
+      - name: Install Backend Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r backend/requirements.txt pytest flake8
+
+      - name: Run Python Code Quality Check (Flake8)
+        working-directory: backend
+        run: |
+          # Check for syntax errors or undefined names
+          flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+
+      - name: Run Backend Pytest Suite
+        working-directory: backend
+        run: |
+          pytest -v --tb=short -W ignore::DeprecationWarning -W ignore::PendingDeprecationWarning
+
+  frontend:
+    name: Frontend Lint & Production Build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install Frontend Dependencies
+        working-directory: frontend
+        run: npm ci
+
+      - name: Run Frontend Lint
+        working-directory: frontend
+        run: npm run lint
+
+      - name: Build Production Assets (Next.js static export)
+        working-directory: frontend
+        env:
+          NEXT_OUTPUT: export
+        run: npm run build
+
+  docker:
+    name: Docker Container Verification
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Validate Compose File
+        run: docker compose config --quiet
+
+      - name: Validate Render Multi-Stage Dockerfile Build
+        run: docker build -t parcelpilot:ci .
+
+      - name: Validate Docker Compose Build
+        run: docker compose build
+        env:
+          GOOGLE_API_KEY: ci-mock-key
