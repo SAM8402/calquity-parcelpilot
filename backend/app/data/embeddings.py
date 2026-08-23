@@ -88,40 +88,38 @@ def _google_embeddings() -> Embeddings:
     return emb
 
 
+class FastEmbedLocalEmbeddings(Embeddings):
+    """Thin wrapper around fastembed.TextEmbedding (avoids broken LangChain probe)."""
+
+    def __init__(self, model_name: str):
+        from fastembed import TextEmbedding
+
+        self._model = TextEmbedding(model_name=model_name)
+        self.model_name = model_name
+
+    def embed_documents(self, texts: List[str]) -> List[List[float]]:
+        return [list(v) for v in self._model.embed(texts or [""])]
+
+    def embed_query(self, text: str) -> List[float]:
+        # Prefer query_embed when available (retrieval-optimized)
+        if hasattr(self._model, "query_embed"):
+            return list(next(self._model.query_embed(text or "")))
+        return list(next(self._model.embed([text or ""])))
+
+
 def _local_embeddings() -> Embeddings:
-    """Prefer FastEmbed (ONNX, no torch). Fall back to sentence-transformers."""
+    """Prefer FastEmbed (ONNX, no torch). Fall back to HashEmbeddings."""
     model = LOCAL_EMBEDDING_MODEL
     try:
-        from langchain_community.embeddings.fastembed import FastEmbedEmbeddings
-
-        emb = FastEmbedEmbeddings(model_name=model)
+        emb = FastEmbedLocalEmbeddings(model_name=model)
         emb.embed_query("ping")
         logger.info("Local embeddings via FastEmbed: %s", model)
         return emb
     except Exception as e_fast:
-        logger.warning("FastEmbed unavailable (%s); trying HuggingFace", e_fast)
-
-    try:
-        from langchain_community.embeddings import HuggingFaceEmbeddings
-
-        # Map common FastEmbed ids to sentence-transformers equivalents
-        hf_model = model
-        if model.startswith("BAAI/") or "/" not in model:
-            hf_model = "sentence-transformers/all-MiniLM-L6-v2"
-        if model.startswith("sentence-transformers/"):
-            hf_model = model
-        emb = HuggingFaceEmbeddings(
-            model_name=hf_model,
-            model_kwargs={"device": "cpu"},
-            encode_kwargs={"normalize_embeddings": True},
+        logger.warning(
+            "FastEmbed unavailable (%s); using HashEmbeddings last-resort", e_fast
         )
-        emb.embed_query("ping")
-        logger.info("Local embeddings via HuggingFace: %s", hf_model)
-        return emb
-    except Exception as e_hf:
-        raise RuntimeError(
-            f"No local embedding backend available (FastEmbed/HF failed): {e_hf}"
-        ) from e_hf
+        return HashEmbeddings()
 
 
 def _build_embeddings(prefer_local: bool = False) -> tuple[Embeddings, str]:
