@@ -1,11 +1,8 @@
-import sys
 import re
 import time
 import logging
 from pathlib import Path
 from contextlib import asynccontextmanager
-
-sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware

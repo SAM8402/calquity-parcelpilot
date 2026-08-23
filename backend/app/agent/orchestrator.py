@@ -6,11 +6,7 @@ Exposes the same `.invoke({input, chat_history})` shape used by main.py.
 from __future__ import annotations
 
 import logging
-import sys
-from pathlib import Path
 from types import SimpleNamespace
-
-sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent))
 
 from langchain_core.messages import AIMessage, HumanMessage, SystemMessage, ToolMessage
 from app.agent.llm import get_llm

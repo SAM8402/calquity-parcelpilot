@@ -79,8 +79,7 @@ python -m app.setup_db
 **Local (optional real Redis):**
 
 ```bash
-docker run -d --name parcelpilot-redis -p 6379:6379 redis:7-alpine
-# Or: docker compose up redis -d
+docker compose --profile redis up redis -d
 ```
 
 ```env
@@ -92,6 +91,8 @@ REDIS_URL=redis://localhost:6379/0
 ### 5. Run Backend
 
 ```bash
+cd backend
+source venv/bin/activate   # Windows: venv\Scripts\activate
 uvicorn app.main:app --reload --port 8000
 ```
 

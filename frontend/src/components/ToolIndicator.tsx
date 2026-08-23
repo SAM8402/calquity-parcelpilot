@@ -1,12 +1,7 @@
 "use client";
 
 import { useState } from "react";
-
-interface ToolUsage {
-  tool: string;
-  input: string;
-  output: string;
-}
+import type { ToolUsage } from "@/types/chat";
 
 interface ToolIndicatorProps {
   tools: ToolUsage[];

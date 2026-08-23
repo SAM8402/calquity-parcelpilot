@@ -75,39 +75,3 @@ def resolve_conflicts(retrieved_docs: list) -> dict:
         "confidence": confidence,
         "warning": warning,
     }
-
-
-def assess_answer_confidence(answer_text: str, sources: list) -> dict:
-    has_customer_agreement = any(
-        s.metadata.get("authority") == "highest" for s in sources
-    )
-    has_current_policy = any(
-        s.metadata.get("authority") == "high" for s in sources
-    )
-    only_deprecated = all(
-        s.metadata.get("status") == "DEPRECATED" for s in sources
-    ) if sources else True
-
-    confidence_score = 0
-    if has_customer_agreement:
-        confidence_score += 50
-    if has_current_policy:
-        confidence_score += 30
-    if len(sources) >= 2:
-        confidence_score += 10
-    if not only_deprecated:
-        confidence_score += 10
-
-    recommendation = None
-    if confidence_score < 40:
-        recommendation = "Consider escalating to a human agent for verification."
-    elif only_deprecated:
-        recommendation = "Warning: Only deprecated sources available. Verify with current documentation."
-
-    return {
-        "confidence_score": min(confidence_score, 100),
-        "has_customer_agreement": has_customer_agreement,
-        "has_current_policy": has_current_policy,
-        "only_deprecated": only_deprecated,
-        "recommendation": recommendation,
-    }

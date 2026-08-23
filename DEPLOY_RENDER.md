@@ -14,7 +14,7 @@ Live Gyansetu example: https://gyansetu-626t.onrender.com
 | Single Docker Web Service | Root `Dockerfile` (Next static export + FastAPI) |
 | Frontend inside backend | Next `out/` → `/app/static`, mounted at `/` |
 | `PORT` | `uvicorn ... --port ${PORT:-10000}` via `scripts/render_start.sh` |
-| Slim deps | `backend/requirements-render.txt` (Gemini embeddings, no torch) |
+| Slim deps | `backend/requirements.txt` (Gemini + FastEmbed ONNX, no torch) |
 | Redis optional | Empty `REDIS_URL` → **fakeredis** in-process (no Redis service) |
 | First-boot data | `setup_db.py` if DuckDB/Chroma missing |
 

@@ -1,54 +1,36 @@
-version: '3.8'
-
+# Local multi-service run. For production, use the root Dockerfile (Render).
 services:
   redis:
+    profiles: ["redis"]
     image: redis:7-alpine
     ports:
       - "6379:6379"
-    volumes:
-      - redis_data:/data
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 10s
       timeout: 3s
       retries: 5
 
-  backend:
-    build: ./backend
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
     ports:
       - "8000:8000"
     environment:
+      - PORT=8000
       - GOOGLE_API_KEY=${GOOGLE_API_KEY}
       - GEMINI_MODEL=${GEMINI_MODEL:-gemini-2.5-flash}
       - EMBEDDING_MODEL=${EMBEDDING_MODEL:-models/gemini-embedding-001}
-      - LLM_FALLBACK_CHAIN=${LLM_FALLBACK_CHAIN:-gemini-2.5-flash,gemini-2.5-flash-lite,gemini-2.0-flash}
-      - CORS_ORIGINS=["http://localhost:3000","http://localhost:8080"]
-      - REDIS_URL=redis://redis:6379/0
-      - CACHE_TTL_CHAT=${CACHE_TTL_CHAT:-600}
-      - CACHE_TTL_DOCS=${CACHE_TTL_DOCS:-3600}
-      - CACHE_TTL_DATA=${CACHE_TTL_DATA:-300}
+      - LOCAL_EMBEDDING_MODEL=${LOCAL_EMBEDDING_MODEL:-BAAI/bge-small-en-v1.5}
+      - EMBEDDING_BACKEND=${EMBEDDING_BACKEND:-auto}
+      - CORS_ORIGINS=["*"]
+      - REDIS_URL=${REDIS_URL:-}
     volumes:
       - ./backend/data:/app/data
       - ./backend/chroma_db:/app/chroma_db
-      - ./backend/parcelpilot.duckdb:/app/parcelpilot.duckdb
-    depends_on:
-      redis:
-        condition: service_healthy
     healthcheck:
-      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/api/health')"]
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/health"]
       interval: 30s
       timeout: 10s
       retries: 3
-
-  frontend:
-    build: ./frontend
-    ports:
-      - "3000:3000"
-    environment:
-      - NEXT_PUBLIC_API_URL=http://backend:8000
-    depends_on:
-      backend:
-        condition: service_healthy
-
-volumes:
-  redis_data:

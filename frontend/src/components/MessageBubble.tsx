@@ -1,21 +1,7 @@
 "use client";
 
 import ReactMarkdown from "react-markdown";
-
-interface ToolUsage {
-  tool: string;
-  input: string;
-  output: string;
-}
-
-interface Message {
-  role: "user" | "assistant";
-  content: string;
-  tools_used?: ToolUsage[];
-  requires_confirmation?: boolean;
-  pending_action_id?: string;
-  timestamp?: string;
-}
+import type { Message } from "@/types/chat";
 
 interface MessageBubbleProps {
   message: Message;

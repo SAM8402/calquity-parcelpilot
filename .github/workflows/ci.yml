@@ -38,9 +38,7 @@ jobs:
         with:
           python-version: "3.11"
           cache: "pip"
-          cache-dependency-path: |
-            backend/requirements.txt
-            backend/requirements-render.txt
+          cache-dependency-path: backend/requirements.txt
 
       - name: Install Backend Dependencies
         run: |
@@ -103,8 +101,4 @@ jobs:
 
       - name: Validate Render Multi-Stage Dockerfile Build
         run: docker build -t parcelpilot:ci .
-
-      - name: Validate Docker Compose Build
-        run: docker compose build
-        env:
-          GOOGLE_API_KEY: ci-mock-key
+        # Single-container image is the production path (compose uses it too)

@@ -15,7 +15,3 @@ def set_current_user(user: User) -> None:
 
 def get_current_user() -> Optional[User]:
     return _current_user.get()
-
-
-def clear_current_user() -> None:
-    _current_user.set(None)

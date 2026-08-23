@@ -4,21 +4,7 @@ import { useState, useRef, useEffect } from "react";
 import MessageBubble from "./MessageBubble";
 import ToolIndicator from "./ToolIndicator";
 import ConfirmationDialog from "./ConfirmationDialog";
-
-interface ToolUsage {
-  tool: string;
-  input: string;
-  output: string;
-}
-
-interface Message {
-  role: "user" | "assistant";
-  content: string;
-  tools_used?: ToolUsage[];
-  requires_confirmation?: boolean;
-  pending_action_id?: string;
-  timestamp?: string;
-}
+import type { Message } from "@/types/chat";
 
 interface ChatWindowProps {
   userId: string;

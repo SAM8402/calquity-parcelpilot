@@ -29,9 +29,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     curl \
     && rm -rf /var/lib/apt/lists/*
 
-# Slim Render deps (Gemini embeddings only — no local torch stack)
-COPY backend/requirements-render.txt .
-RUN pip install --no-cache-dir -r requirements-render.txt
+# Slim Render deps (Gemini + FastEmbed ONNX — no torch)
+COPY backend/requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
 
 COPY backend/ .
 

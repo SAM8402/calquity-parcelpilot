@@ -1,8 +1,3 @@
-import sys
-from pathlib import Path
-
-sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent.parent))
-
 import duckdb
 from langchain.tools import tool
 from app.config import DB_PATH

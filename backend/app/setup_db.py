@@ -1,10 +1,7 @@
 """One-time setup script to ingest all data into DuckDB and ChromaDB."""
-import sys
 from pathlib import Path
-
-sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
-
 from shutil import copy2
+
 from app.data.ingest_excel import ingest_excel_to_db
 from app.config import GOOGLE_API_KEY, PDF_DIR, EXCEL_DIR, BASE_DIR
 
