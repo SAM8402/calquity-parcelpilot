@@ -22,6 +22,10 @@ from app.services.cache_service import cache_service
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+# Gemini tool schema conversion drops JSON-Schema keys LangChain emits
+# (title / anyOf / default). Harmless — silence the spam on Render.
+logging.getLogger("langchain_google_genai._function_utils").setLevel(logging.ERROR)
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
