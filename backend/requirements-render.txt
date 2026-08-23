@@ -1,0 +1,19 @@
+# Slim requirements for Render free-tier (single Docker web service).
+# Same stack as requirements.txt — ParcelPilot already uses Gemini embeddings
+# (no torch / sentence-transformers). Kept as a separate file so deploy docs
+# match the Gyansetu Render pattern.
+
+fastapi==0.115.0
+uvicorn[standard]==0.30.0
+langchain==0.3.1
+langchain-google-genai==2.0.0
+langchain-community==0.3.1
+chromadb==0.5.0
+openpyxl==3.1.5
+pandas==2.2.2
+pydantic==2.9.0
+python-dotenv==1.0.1
+pypdf==4.3.1
+duckdb==1.1.0
+redis==5.0.8
+fakeredis==2.26.2

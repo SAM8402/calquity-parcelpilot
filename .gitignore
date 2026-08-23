@@ -1,0 +1,48 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+.venv/
+.env
+.env.local
+.env.*.local
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# DuckDB / local databases
+*.duckdb
+*.duckdb.wal
+*.duckdb.tmp
+
+# ChromaDB / vector store
+chroma_db/
+backend/chroma_db/
+
+# Node
+node_modules/
+.next/
+out/
+.vercel/
+npm-debug.log*
+yarn-error.log*
+
+# IDE / OS
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# Logs / temp
+*.log
+tmp/
+.cache/
+
+# Test / local run artifacts
+*.xlsx~

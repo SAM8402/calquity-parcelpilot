@@ -1,0 +1,37 @@
+# Render Blueprint — single Web Service (Gyansetu-style).
+# Docs: https://render.com/docs/blueprint-spec
+#
+# After first deploy, set GOOGLE_API_KEY in the Render dashboard
+# (or sync this file via Blueprint with a secret).
+
+services:
+  - type: web
+    name: parcelpilot
+    runtime: docker
+    plan: free
+    region: oregon
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    healthCheckPath: /api/health
+    envVars:
+      - key: GOOGLE_API_KEY
+        sync: false
+      - key: GEMINI_MODEL
+        value: gemini-2.5-flash
+      - key: LLM_FALLBACK_CHAIN
+        value: gemini-2.5-flash,gemini-2.5-flash-lite,gemini-2.0-flash,gemini-2.0-flash-lite,gemini-2.5-pro
+      - key: EMBEDDING_MODEL
+        value: models/gemini-embedding-001
+      - key: CORS_ORIGINS
+        value: '["*"]'
+      # Empty → fakeredis in-process (no Render Redis service)
+      - key: REDIS_URL
+        value: ""
+      - key: CACHE_TTL_CHAT
+        value: "600"
+      - key: CACHE_TTL_DOCS
+        value: "3600"
+      - key: CACHE_TTL_DATA
+        value: "300"
+      - key: PYTHONUNBUFFERED
+        value: "1"

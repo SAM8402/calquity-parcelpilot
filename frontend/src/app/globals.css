@@ -1,0 +1,74 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --ink: #102a2e;
+  --ink-soft: #2a4549;
+  --ink-muted: #5c7377;
+  --paper: #f4f6f3;
+  --paper-raised: #fbfcfa;
+  --paper-line: #d5ddd7;
+  --signal: #1f6f5b;
+  --signal-deep: #164f41;
+  --signal-wash: #e4f1ec;
+  --warn: #b45309;
+}
+
+body {
+  color: var(--ink);
+  background-color: var(--paper);
+  min-height: 100vh;
+}
+
+/* Blueprint-style atmosphere (not a color gradient) */
+.app-shell {
+  background-color: var(--paper);
+  background-image:
+    linear-gradient(rgba(16, 42, 46, 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(16, 42, 46, 0.035) 1px, transparent 1px);
+  background-size: 28px 28px;
+  background-position: -1px -1px;
+}
+
+.app-shell::before {
+  content: "";
+  pointer-events: none;
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 70% 50% at 12% 0%, rgba(31, 111, 91, 0.08), transparent 55%),
+    radial-gradient(ellipse 50% 40% at 100% 100%, rgba(16, 42, 46, 0.05), transparent 50%);
+  z-index: 0;
+}
+
+.app-content {
+  position: relative;
+  z-index: 1;
+}
+
+@layer utilities {
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 6px;
+  }
+  .scrollbar-thin::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    background: #c5d0cb;
+    border-radius: 999px;
+  }
+  .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+    background: #9aada6;
+  }
+}
+
+.brand-rule {
+  transform-origin: left center;
+  animation: rule-draw 0.7s ease-out both;
+}
+
+.stagger-1 { animation-delay: 0.05s; }
+.stagger-2 { animation-delay: 0.12s; }
+.stagger-3 { animation-delay: 0.2s; }
+.stagger-4 { animation-delay: 0.28s; }

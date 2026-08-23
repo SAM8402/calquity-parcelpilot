@@ -1,0 +1,115 @@
+ParcelPilot — Demo Video Question Script (~5 minutes)
+=====================================================
+Use this while screen-recording. Speak briefly between questions.
+URL: http://127.0.0.1:3000  (or your hosted URL)
+
+
+--------------------------------------------------
+0) INTRO (15–20 sec, no chat yet)
+--------------------------------------------------
+Say:
+- "This is ParcelPilot — an AI support desk for policies, agreements, and live order data."
+- Point at the left rail: brand, persona/ACL context, dataset snapshot.
+- "I'll switch personas to show customer ACL, multi-step reasoning, confirmation, and ops proactive scan."
+
+
+--------------------------------------------------
+1) PERSONA: Alex (Northstar) — Customer
+   Switch user to: Alex (Northstar)
+--------------------------------------------------
+
+Q1 (STAR question — multi-step + agreement vs SOP):
+   Can Northstar cancel ORD-1001 without a cancellation fee? Explain why and cite sources.
+
+   What to say after answer:
+   - Expand "tools invoked" and show order lookup + document search.
+   - Note: enterprise agreement overrides general cancellation SOP.
+
+Q2 (own-account lookup):
+   What is the status of ORD-1001?
+
+Q3 (ACL block — must NOT leak LumenWorks data):
+   What is LumenWorks' SLA for critical issues?
+
+   What to say after answer:
+   - "As Northstar, the agent refuses or cannot access another customer's agreement."
+
+
+--------------------------------------------------
+2) PERSONA: Sam (Support) — Support Agent
+   Switch user to: Sam (Support)
+--------------------------------------------------
+
+Q4 (policy + credit reasoning):
+   A pickup is 3 hours late due to carrier fault. Should the customer get a service credit? Explain using policy.
+
+Q5 (structured data):
+   Show me all open high-severity tickets.
+
+Q6 (human-in-the-loop action):
+   Escalate ticket TKT-501 to engineering with high priority. Prepare the escalation for confirmation.
+
+   What to do after answer:
+   - Click Confirm & execute in the dialog (or Cancel once to show the gate).
+   - Say: "Mutations never run from chat alone — confirm API only."
+
+
+--------------------------------------------------
+3) PERSONA: Taylor (Ops) — Operations
+   Switch user to: Taylor (Ops)
+--------------------------------------------------
+
+Q7 (proactive / Problem 1):
+   What issues are affecting multiple customers right now?
+
+   What to say after answer:
+   - "Ops-only proactive tool — SLA breaches, recurring patterns, multi-customer impact."
+
+
+--------------------------------------------------
+4) OPTIONAL (if time left, ~30–45 sec)
+--------------------------------------------------
+
+Q8 (Jordan / LumenWorks customer):
+   Switch to Jordan (LumenWorks), then ask:
+   Can I see order ORD-1001?
+
+   Expected: blocked or not their order (Northstar's ORD-1001).
+
+Q9 (deprecated / trust — Problem 2):
+   As Sam (Support), ask:
+   Is the old Support Policy v2 still the current cancellation rules?
+
+   Expected: agent treats deprecated docs as context only, prefers current policy/agreement.
+
+
+--------------------------------------------------
+5) OUTRO (20–30 sec)
+--------------------------------------------------
+Say:
+- Stack: FastAPI + LangChain/Gemini + ChromaDB + DuckDB + Redis + Next.js.
+- Highlights: tool-layer ACL, source authority hierarchy, confirm-before-mutate.
+- Point to README / ARCHITECTURE / PRODUCT_NOTE if you show the repo briefly.
+
+
+--------------------------------------------------
+COPY-PASTE CHEAT SHEET (exact prompts)
+--------------------------------------------------
+1. Can Northstar cancel ORD-1001 without a cancellation fee? Explain why and cite sources.
+2. What is the status of ORD-1001?
+3. What is LumenWorks' SLA for critical issues?
+4. A pickup is 3 hours late due to carrier fault. Should the customer get a service credit? Explain using policy.
+5. Show me all open high-severity tickets.
+6. Escalate ticket TKT-501 to engineering with high priority. Prepare the escalation for confirmation.
+7. What issues are affecting multiple customers right now?
+8. Can I see order ORD-1001?
+9. Is the old Support Policy v2 still the current cancellation rules?
+
+
+TIPS
+----
+- Wait for the full answer before moving on (multi-tool queries can take ~10–20s).
+- Expand tool details on Q1 and Q7 — that sells engineering effort.
+- Keep voice calm; narrate WHAT you are proving, not every line of UI.
+- If Redis/cache is on, a repeated Q1 may be faster — mention cache only if it shows from_cache / feels instant.
+- Target total runtime ~4–5 minutes; skip Q8–Q9 if short on time.
