@@ -9,6 +9,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from langchain_core.messages import HumanMessage, AIMessage
 
@@ -269,12 +270,49 @@ async def health():
     }
 
 
-# Production UI (Render single-container): serve Next.js static export last,
-# so /api/* routes registered above always win (Gyansetu pattern).
+def _register_static_ui(app: FastAPI, static_dir: Path) -> None:
+    """Serve Next.js static export without shadowing /api/* routes.
+
+    Mounting StaticFiles at ``/`` intercepts every path (including POST /api/chat)
+    on production; use explicit asset mounts + GET-only SPA fallback instead.
+    """
+    if not static_dir.is_dir() or not (static_dir / "index.html").is_file():
+        return
+
+    next_dir = static_dir / "_next"
+    if next_dir.is_dir():
+        app.mount(
+            "/_next",
+            StaticFiles(directory=str(next_dir)),
+            name="next_static",
+        )
+
+    for item in static_dir.iterdir():
+        if item.name in {"_next", "index.html"}:
+            continue
+        if item.is_dir():
+            app.mount(
+                f"/{item.name}",
+                StaticFiles(directory=str(item)),
+                name=f"static_{item.name}",
+            )
+
+    @app.get("/")
+    async def serve_index():
+        return FileResponse(static_dir / "index.html")
+
+    @app.get("/{full_path:path}")
+    async def spa_fallback(full_path: str):
+        if full_path.startswith("api/") or full_path == "api":
+            raise HTTPException(status_code=404, detail="Not found")
+        candidate = static_dir / full_path
+        if candidate.is_file():
+            return FileResponse(candidate)
+        nested = static_dir / full_path / "index.html"
+        if nested.is_file():
+            return FileResponse(nested)
+        return FileResponse(static_dir / "index.html")
+
+
 STATIC_DIR = Path(__file__).resolve().parent.parent / "static"
-if STATIC_DIR.is_dir() and (STATIC_DIR / "index.html").is_file():
-    app.mount(
-        "/",
-        StaticFiles(directory=str(STATIC_DIR), html=True),
-        name="ui",
-    )
+_register_static_ui(app, STATIC_DIR)
