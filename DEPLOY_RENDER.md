@@ -35,7 +35,7 @@ Live Gyansetu example: https://gyansetu-626t.onrender.com
 3. Connect the GitHub repo → apply `render.yaml`.
 4. When prompted, set **GOOGLE_API_KEY** (secret).
 5. Wait for first build. First boot runs `setup_db.py` (PDF/Excel → DuckDB + Chroma) — can take several minutes.
-6. Open `https://<your-service>.onrender.com` — UI + `/api/health` on the same origin.
+6. Open [https://calquity-parcelpilot.onrender.com](https://calquity-parcelpilot.onrender.com) — UI + `/api/health` on the same origin.
 
 ---
 
@@ -62,7 +62,7 @@ REDIS_URL=
 Leave `REDIS_URL` empty so the app uses **fakeredis** (in-memory). Do not add a Render Redis addon for the free demo.
 
 4. Deploy. After green, test:
-   - `GET https://<service>.onrender.com/api/health` — expect `"cache_backend": "fakeredis"`
+   - `GET https://calquity-parcelpilot.onrender.com/api/health` — expect `"cache_backend": "fakeredis"`
    - Open the root URL and run an ORD-1001 demo question.
 
 ---
@@ -96,10 +96,6 @@ Then open http://127.0.0.1:10000
 
 ## After deploy (submission)
 
-Add the URL to your CalQuity form and README, e.g.:
+Live demo: [https://calquity-parcelpilot.onrender.com](https://calquity-parcelpilot.onrender.com)
 
-```
-Live demo: https://parcelpilot-xxxx.onrender.com
-```
-
-Optional: put the same link at the top of `README.md` under a “Live Prototype” heading (Gyansetu style).
+The URL is already added to `README.md` under the "Live Prototype" heading.

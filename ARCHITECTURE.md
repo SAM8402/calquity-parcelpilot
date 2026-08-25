@@ -94,7 +94,7 @@ The system implements a 5-tier authority hierarchy:
 
 | Decision | Chosen | Alternative | Rationale |
 |----------|--------|-------------|-----------|
-| LLM | Gemini 2.0 Flash | GPT-4o | Free tier, fast, good function calling |
+| LLM | Gemini 2.5 Flash | GPT-4o | Free tier, fast, good function calling |
 | Vector DB | ChromaDB (local) | Pinecone (hosted) | Zero-config, no external dependency |
 | SQL Engine | DuckDB | PostgreSQL | Embedded, analytical, no server needed |
 | Auth | Mock (in-memory) | JWT/OAuth | Simplified for assessment; production pattern shown |

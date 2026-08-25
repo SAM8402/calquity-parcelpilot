@@ -65,7 +65,7 @@ Build an admin workflow to upload new document versions, auto-tag authority/stat
 | **Production authentication (JWT/OAuth)** | Mocked for assessment scope; the data-layer access pattern is production-ready |
 | **Streaming responses** | Would add complexity; demonstrated the core agent + tool pipeline first |
 | **Persistent chat history (database-backed)** | In-memory is sufficient for demo; PostgreSQL-backed history is a straightforward follow-up |
-| **Hosted production deployment** | Local/Docker ready; hosted URL is preferred for submission but left to the candidate environment |
+| ~~**Hosted production deployment**~~ | ✅ Deployed at [https://calquity-parcelpilot.onrender.com](https://calquity-parcelpilot.onrender.com) (Render free-tier, Docker) |
 | **Fine-tuned embeddings** | Default Google embeddings perform well for this document set |
 | **Comprehensive CI test suite** | Smoke + edge verification scripts are included; full CI is a follow-up |
 
